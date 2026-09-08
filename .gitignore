@@ -1,1 +1,10 @@
+# Runtime-generated model candidates and validation reports
+backend/models/candidate_*.joblib
+backend/models/candidate_*_metrics.json
+backend/models/custom_weather_model_v2.joblib
+backend/models/custom_weather_model_v2_metrics.json
 
+# Python and Streamlit local state
+__pycache__/
+*.py[cod]
+.streamlit/secrets.toml

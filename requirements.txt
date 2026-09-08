@@ -1,0 +1,15 @@
+# Backend
+fastapi>=0.104.1
+uvicorn>=0.24.0
+requests>=2.31.0
+numpy>=1.26.0
+pandas>=2.0.3
+# Pinned to the versions used to train active_weather_model.joblib.
+# Pickled scikit-learn models cannot safely be loaded by arbitrary versions.
+scikit-learn==1.6.1
+joblib==1.5.2
+python-dotenv>=1.0.0
+
+# Frontend
+streamlit>=1.25.0
+plotly>=5.17.0

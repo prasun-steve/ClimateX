@@ -1,0 +1,16 @@
+{
+  "model": "active_weather_model.joblib",
+  "trained_through": "2026-09-07 23:00:00",
+  "train_rows": 32716,
+  "test_rows": 8179,
+  "mae": {
+    "Temperature (\u00b0C)": 0.529,
+    "Radiation (W/m\u00b2)": 22.606,
+    "Wind Speed (m/s)": 2.153,
+    "Humidity (%)": 3.231,
+    "Precipitation (mm/hr)": 0.276,
+    "Cloud Coverage (%)": 14.545,
+    "Pressure (kPa)": 0.035
+  },
+  "activated": true
+}
