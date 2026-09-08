@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import datetime
 import os
 import sys
@@ -182,6 +181,19 @@ st.markdown("""
     }
     .streamlit-expanderHeader { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-style: italic; }
 
+    /* ---- Chart section headers -------------------------------------------*/
+    .section-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1.35rem;
+        color: var(--ivory);
+        margin: 1.8rem 0 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--hairline);
+    }
+    .section-title:first-of-type { margin-top: 0.4rem; }
+
     .coast-footer {
         text-align: center;
         padding: 1.4rem 0 0.4rem;
@@ -312,67 +324,83 @@ if "predictions" in st.session_state and st.session_state.predictions:
 
     st.markdown("---")
 
-    fig = make_subplots(
-        rows=3, cols=1,
-        subplot_titles=('Temperature', 'Humidity & precipitation', 'Wind speed & radiation'),
-        vertical_spacing=0.12
-    )
+    def style_fig(fig, height=320, show_xaxis_title=False):
+        fig.update_layout(
+            height=height,
+            showlegend=True,
+            hovermode='x unified',
+            plot_bgcolor='#0F171C',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(family="Jost, sans-serif", color="#EDE7D8", size=12),
+            legend=dict(bgcolor='rgba(0,0,0,0)'),
+            margin=dict(t=20, l=55, r=40, b=40),
+        )
+        fig.update_xaxes(
+            gridcolor='rgba(198,161,91,0.10)',
+            title_text="Time" if show_xaxis_title else None
+        )
+        fig.update_yaxes(gridcolor='rgba(198,161,91,0.10)', zerolinecolor='rgba(198,161,91,0.16)')
+        return fig
 
-    fig.add_trace(
+    # ---- Temperature -----------------------------------------------------
+    st.markdown('<div class="section-title">Temperature</div>', unsafe_allow_html=True)
+    fig_temp = go.Figure()
+    fig_temp.add_trace(
         go.Scatter(x=df['datetime'], y=df['Temperature (°C)'],
                   mode='lines+markers', name='Temperature',
                   line=dict(color='#C6A15B', width=2.5),
-                  marker=dict(size=6)),
-        row=1, col=1
+                  marker=dict(size=6))
     )
+    fig_temp.update_yaxes(title_text="°C")
+    style_fig(fig_temp, height=320)
+    st.plotly_chart(fig_temp, use_container_width=True)
 
-    fig.add_trace(
+    # ---- Humidity & precipitation -----------------------------------------
+    st.markdown('<div class="section-title">Humidity &amp; precipitation</div>', unsafe_allow_html=True)
+    fig_hp = go.Figure()
+    fig_hp.add_trace(
         go.Scatter(x=df['datetime'], y=df['Humidity (%)'],
                   mode='lines+markers', name='Humidity',
                   line=dict(color='#4B6F64', width=2.5),
-                  marker=dict(size=6)),
-        row=2, col=1
+                  marker=dict(size=6), yaxis='y1')
     )
-
-    fig.add_trace(
+    fig_hp.add_trace(
         go.Bar(x=df['datetime'], y=df['Precipitation (mm/hr)'],
               name='Precipitation', marker_color='#5C7A8A',
-              opacity=0.6),
-        row=2, col=1
+              opacity=0.6, yaxis='y2')
     )
+    fig_hp.update_layout(
+        yaxis=dict(title="Humidity (%)", gridcolor='rgba(198,161,91,0.10)'),
+        yaxis2=dict(title="Precipitation (mm/hr)", overlaying='y', side='right', showgrid=False),
+    )
+    style_fig(fig_hp, height=340)
+    st.plotly_chart(fig_hp, use_container_width=True)
 
-    fig.add_trace(
+    # ---- Wind speed --------------------------------------------------------
+    st.markdown('<div class="section-title">Wind speed</div>', unsafe_allow_html=True)
+    fig_wind = go.Figure()
+    fig_wind.add_trace(
         go.Scatter(x=df['datetime'], y=df['Wind Speed (m/s)'],
                   mode='lines+markers', name='Wind Speed',
                   line=dict(color='#8C5A3C', width=2.5),
-                  marker=dict(size=6)),
-        row=3, col=1
+                  marker=dict(size=6))
     )
+    fig_wind.update_yaxes(title_text="m/s")
+    style_fig(fig_wind, height=300)
+    st.plotly_chart(fig_wind, use_container_width=True)
 
-    fig.add_trace(
+    # ---- Radiation -----------------------------------------------------------
+    st.markdown('<div class="section-title">Radiation</div>', unsafe_allow_html=True)
+    fig_rad = go.Figure()
+    fig_rad.add_trace(
         go.Scatter(x=df['datetime'], y=df['Radiation (W/m²)'],
                   mode='lines+markers', name='Radiation',
                   line=dict(color='#D9C08C', width=2.5),
-                  marker=dict(size=6)),
-        row=3, col=1
+                  marker=dict(size=6))
     )
-
-    fig.update_layout(
-        height=900,
-        showlegend=True,
-        hovermode='x unified',
-        plot_bgcolor='#0F171C',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(family="Jost, sans-serif", color="#EDE7D8", size=12),
-        legend=dict(bgcolor='rgba(0,0,0,0)'),
-        margin=dict(t=60, l=50, r=30, b=40),
-    )
-    fig.update_xaxes(title_text="Time", row=3, col=1, gridcolor='rgba(198,161,91,0.10)')
-    fig.update_xaxes(gridcolor='rgba(198,161,91,0.10)')
-    fig.update_yaxes(gridcolor='rgba(198,161,91,0.10)', zerolinecolor='rgba(198,161,91,0.16)')
-    fig.update_annotations(font=dict(family="Cormorant Garamond, serif", size=15, color="#EDE7D8"))
-
-    st.plotly_chart(fig, use_container_width=True)
+    fig_rad.update_yaxes(title_text="W/m²")
+    style_fig(fig_rad, height=300, show_xaxis_title=True)
+    st.plotly_chart(fig_rad, use_container_width=True)
 
     with st.expander("View hourly breakdown"):
         st.dataframe(
